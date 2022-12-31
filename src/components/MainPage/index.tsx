@@ -303,13 +303,13 @@ export const MainPage = () => {
   return (
     <Center >
       <VStack gap={5}>
-        <HStack mt={10} alignItems={'end'}><Heading as={'h1'}>Custom Token Minting App</Heading> <ColorModeSwitcher /> </HStack>
+        <HStack mt={10} alignItems={'end'}><Heading as={'h1'}>Polar Genesis</Heading> <ColorModeSwitcher /> </HStack>
        {chainId && <Text>Network : {  chainId === 5 ?'Goerli': chainId === 1 ? 'Main' : 'Not Supported'}</Text>}
-        <Button onClick={() => activateBrowserWallet()} isDisabled={!!account}> {account ? 'Connected' : 'Connect Wallet'}</Button>
+        <Button onClick={() => activateBrowserWallet()} isDisabled={!!account}> {account ? 'Wallet Connected' : 'Connect to Mint'}</Button>
         {account && (chainId ===5 || chainId ===1)  &&
           <VStack gap={5}>
 
-            <VStack bg={colorMode === 'light' ? 'gray.200' : 'gray.700'} rounded='lg' p={5} align={'start'} gap={5}>
+            <VStack bg={'gray.700'} rounded='lg' p={5} align={'start'} gap={5}>
 
               <HStack><Text >Account Connected: </Text> <Text fontWeight={'bold'}> {account}</Text></HStack>
 
