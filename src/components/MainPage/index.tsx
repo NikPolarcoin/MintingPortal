@@ -2,7 +2,7 @@ import { useEffect, useState } from "react"
 import {
   Box,
   Text,
-  
+
   VStack,
 
   Button,
@@ -10,7 +10,7 @@ import {
   Heading,
   HStack,
   Stat,
- 
+
   StatLabel,
   StatNumber,
   Spinner,
@@ -23,7 +23,7 @@ import {
 } from "@chakra-ui/react"
 
 import { ethers } from "ethers"
-import {  useEthers, useEtherBalance, useContractFunction } from '@usedapp/core';
+import { useEthers, useEtherBalance, useContractFunction } from '@usedapp/core';
 import { info } from '../../utils/contractInfo'
 import { ColorModeSwitcher } from "./ColorModeSwitcher";
 
@@ -32,13 +32,15 @@ export const MainPage = () => {
 
   const { activateBrowserWallet, account, library, chainId } = useEthers()
 
-  const {colorMode } = useColorMode()
+  const { colorMode } = useColorMode()
 
   const etherBalance = useEtherBalance(account)
 
 
   const [mintLoading, setMintLoading] = useState<boolean>(false)
   const [BurnLoading, setBurnLoading] = useState<boolean>(false)
+
+  const [applyWhitelistingLoading, setApplyWhitelistingLoading] = useState<boolean>(false)
 
 
 
@@ -55,24 +57,28 @@ export const MainPage = () => {
   const [burnValue, setBurnValue] = useState<string>('0')
   const [myTokenContract, setMyTokenContract] = useState<ethers.Contract>()
   const [usdcContract, setUsdcContract] = useState<ethers.Contract>()
+  const [whitelistStatus, setWhitelistStatus] = useState<number>()
 
-  
+  const [refetchWhitelistingStatus, setRefetchWhitelistingStatus] = useState(false)
+
+
   const approve = useContractFunction(usdcContract, 'approve', { transactionName: 'approve' })
   const mint = useContractFunction(myTokenContract, 'mint', { transactionName: 'mint' })
   const burn = useContractFunction(myTokenContract, 'burn', { transactionName: 'burn' })
+  const applyForWhitelist = useContractFunction(myTokenContract, 'applyForWhitelist', { transactionName: 'applyForWhitelist' })
 
 
 
-  useEffect(()=>{
+  useEffect(() => {
 
-    if(chainId){
+    if (chainId) {
 
-      if (chainId === 5){
-       setMyTokenContract(new ethers.Contract(info.myTokenaddressGoerli, info.abi, library))
-       setUsdcContract(new ethers.Contract(info.usdcContractAddressGoerli, info.abi, library))
+      if (chainId === 5) {
+        setMyTokenContract(new ethers.Contract(info.myTokenaddressGoerli, info.abi, library))
+        setUsdcContract(new ethers.Contract(info.usdcContractAddressGoerli, info.abi, library))
 
       }
-      else if (chainId === 1){
+      else if (chainId === 1) {
         setMyTokenContract(new ethers.Contract(info.myTokenaddressMain, info.abi, library))
         setUsdcContract(new ethers.Contract(info.myTokenaddressMain, info.abi, library))
       }
@@ -80,7 +86,38 @@ export const MainPage = () => {
     }
 
 
-  },[chainId,library])
+  }, [chainId, library])
+
+
+
+
+
+  useEffect(() => {
+
+    if (account && myTokenContract) {
+
+
+      const getWhilistStatus = async () => {
+        try {
+          const getWhitelisted = await myTokenContract.whitelisted(account)
+
+          console.log('whielistStatus', getWhitelisted)
+          setWhitelistStatus(getWhitelisted)
+        }
+        catch (e) {
+          console.log(e)
+        }
+
+
+      }
+
+      getWhilistStatus()
+
+    }
+
+
+
+  }, [account, myTokenContract, refetchWhitelistingStatus])
 
 
 
@@ -128,7 +165,7 @@ export const MainPage = () => {
     }
 
 
-  }, [account, refetchUserData,myTokenContract,usdcContract])
+  }, [account, refetchUserData, myTokenContract, usdcContract])
 
 
 
@@ -158,7 +195,7 @@ export const MainPage = () => {
 
 
 
-  }, [library,myTokenContract])
+  }, [library, myTokenContract])
 
 
   useEffect(() => {
@@ -186,7 +223,7 @@ export const MainPage = () => {
 
 
 
-  }, [library, refetchContractData,myTokenContract])
+  }, [library, refetchContractData, myTokenContract])
 
 
   useEffect(() => {
@@ -216,7 +253,7 @@ export const MainPage = () => {
 
 
 
-  }, [library, refetchContractData,usdcContract])
+  }, [library, refetchContractData, usdcContract])
 
 
 
@@ -249,8 +286,25 @@ export const MainPage = () => {
 
 
 
-  }, [library, account, refetchAllowance,usdcContract])
+  }, [library, account, refetchAllowance, usdcContract])
 
+
+
+
+  const onApplyForWhitelistingHandler = async () => {
+
+    setApplyWhitelistingLoading(true)
+
+
+    const output = await applyForWhitelist.send()
+
+    console.log('apply whitelist output', output)
+
+    setRefetchWhitelistingStatus(!refetchWhitelistingStatus)
+
+    setApplyWhitelistingLoading(false)
+
+  }
 
 
 
@@ -304,12 +358,12 @@ export const MainPage = () => {
     <Center >
       <VStack gap={5}>
         <HStack mt={10} alignItems={'end'}><Heading as={'h1'}>Polar Genesis</Heading> <ColorModeSwitcher /> </HStack>
-       {chainId && <Text>Network : {  chainId === 5 ?'Goerli': chainId === 1 ? 'Main' : 'Not Supported'}</Text>}
+        {chainId && <Text>Network : {chainId === 5 ? 'Goerli' : chainId === 1 ? 'Main' : 'Not Supported'}</Text>}
         <Button onClick={() => activateBrowserWallet()} isDisabled={!!account}> {account ? 'Wallet Connected' : 'Connect to Mint'}</Button>
-        {account && (chainId ===5 || chainId ===1)  &&
+        {account && (chainId === 5 || chainId === 1) &&
           <VStack gap={5}>
 
-            <VStack bg={'gray.700'} rounded='lg' p={5} align={'start'} gap={5}>
+            <VStack  bg={colorMode === 'light' ? 'gray.200' : 'gray.700'} rounded='lg' p={5} align={'start'} gap={5}>
 
               <HStack><Text >Account Connected: </Text> <Text fontWeight={'bold'}> {account}</Text></HStack>
 
@@ -361,7 +415,15 @@ export const MainPage = () => {
             </VStack>
 
 
-            {userUsdcbalance !== undefined && tokenPrice !== undefined && allowance !== undefined && userMyTokenbalance &&
+            {whitelistStatus === 0 &&
+              <Button disabled={applyWhitelistingLoading} onClick={()=>onApplyForWhitelistingHandler()}>  Apply for Whitelisting {applyWhitelistingLoading && <Spinner size={'sm'} ml={2} />} </Button>
+            }
+
+            { whitelistStatus === 2 &&
+              <Text fontSize={'lg'}>You have already applied for whitelisting!</Text>
+            }
+
+            {userUsdcbalance !== undefined && tokenPrice !== undefined && allowance !== undefined && userMyTokenbalance && whitelistStatus !== undefined && whitelistStatus === 1 &&
 
               <VStack gap={5}>
                 <VStack>
@@ -397,19 +459,19 @@ export const MainPage = () => {
                   </HStack>
                   {Number(contractUsdcbalance) < Number(burnValue) * Number(tokenPrice) && <Text color={'red'}>The contract does not have sufficient USDC</Text>}
 
-                  </VStack>
-
                 </VStack>
-
-
-            }
 
               </VStack>
 
 
-
             }
+
           </VStack>
+
+
+
+        }
+      </VStack>
     </Center>
   )
 

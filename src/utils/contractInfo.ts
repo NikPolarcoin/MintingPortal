@@ -2,55 +2,16 @@
 export const info = {
 
     usdcContractAddressGoerli: "0x07865c6E87B9F70255377e024ace6630C1Eaa37F",
-    myTokenaddressGoerli: "0xfe3BB51312761Dad5a3F7A0cfc7484817C1F4945",
+    myTokenaddressGoerli: "0x93A301091793cAe8BC69c048c948650956A5e750",
     usdcContractAddressMain: '0x07865c6E87B9F70255377e024ace6630C1Eaa37F',
     myTokenaddressMain: '0xfe3BB51312761Dad5a3F7A0cfc7484817C1F4945',
     abi: [
         {
-            "inputs": [
-                {
-                    "internalType": "string",
-                    "name": "_name",
-                    "type": "string"
-                },
-                {
-                    "internalType": "string",
-                    "name": "_symbol",
-                    "type": "string"
-                },
-                {
-                    "internalType": "uint256",
-                    "name": "_price",
-                    "type": "uint256"
-                }
-            ],
+            "inputs": [],
+            "name": "applyForWhitelist",
+            "outputs": [],
             "stateMutability": "nonpayable",
-            "type": "constructor"
-        },
-        {
-            "anonymous": false,
-            "inputs": [
-                {
-                    "indexed": true,
-                    "internalType": "address",
-                    "name": "owner",
-                    "type": "address"
-                },
-                {
-                    "indexed": true,
-                    "internalType": "address",
-                    "name": "spender",
-                    "type": "address"
-                },
-                {
-                    "indexed": false,
-                    "internalType": "uint256",
-                    "name": "value",
-                    "type": "uint256"
-                }
-            ],
-            "name": "Approval",
-            "type": "event"
+            "type": "function"
         },
         {
             "inputs": [
@@ -116,6 +77,65 @@ export const info = {
         {
             "inputs": [
                 {
+                    "internalType": "string",
+                    "name": "_name",
+                    "type": "string"
+                },
+                {
+                    "internalType": "string",
+                    "name": "_symbol",
+                    "type": "string"
+                },
+                {
+                    "internalType": "uint256",
+                    "name": "_price",
+                    "type": "uint256"
+                }
+            ],
+            "stateMutability": "nonpayable",
+            "type": "constructor"
+        },
+        {
+            "anonymous": false,
+            "inputs": [
+                {
+                    "indexed": true,
+                    "internalType": "address",
+                    "name": "owner",
+                    "type": "address"
+                },
+                {
+                    "indexed": true,
+                    "internalType": "address",
+                    "name": "spender",
+                    "type": "address"
+                },
+                {
+                    "indexed": false,
+                    "internalType": "uint256",
+                    "name": "value",
+                    "type": "uint256"
+                }
+            ],
+            "name": "Approval",
+            "type": "event"
+        },
+        {
+            "inputs": [
+                {
+                    "internalType": "address",
+                    "name": "_address",
+                    "type": "address"
+                }
+            ],
+            "name": "approveWhitelist",
+            "outputs": [],
+            "stateMutability": "nonpayable",
+            "type": "function"
+        },
+        {
+            "inputs": [
+                {
                     "internalType": "address",
                     "name": "spender",
                     "type": "address"
@@ -172,6 +192,32 @@ export const info = {
         {
             "inputs": [],
             "name": "renounceOwnership",
+            "outputs": [],
+            "stateMutability": "nonpayable",
+            "type": "function"
+        },
+        {
+            "inputs": [
+                {
+                    "internalType": "address",
+                    "name": "_address",
+                    "type": "address"
+                }
+            ],
+            "name": "revokeWhitelist",
+            "outputs": [],
+            "stateMutability": "nonpayable",
+            "type": "function"
+        },
+        {
+            "inputs": [
+                {
+                    "internalType": "uint256",
+                    "name": "_newFee",
+                    "type": "uint256"
+                }
+            ],
+            "name": "setMintFee",
             "outputs": [],
             "stateMutability": "nonpayable",
             "type": "function"
@@ -283,6 +329,19 @@ export const info = {
         {
             "inputs": [
                 {
+                    "internalType": "uint256",
+                    "name": "_newCap",
+                    "type": "uint256"
+                }
+            ],
+            "name": "updateSupplyCap",
+            "outputs": [],
+            "stateMutability": "nonpayable",
+            "type": "function"
+        },
+        {
+            "inputs": [
+                {
                     "internalType": "address",
                     "name": "_address",
                     "type": "address"
@@ -295,6 +354,19 @@ export const info = {
         },
         {
             "inputs": [],
+            "name": "withdrawUSDC",
+            "outputs": [],
+            "stateMutability": "nonpayable",
+            "type": "function"
+        },
+        {
+            "inputs": [
+                {
+                    "internalType": "uint256",
+                    "name": "_amount",
+                    "type": "uint256"
+                }
+            ],
             "name": "withdrawUSDC",
             "outputs": [],
             "stateMutability": "nonpayable",
@@ -345,12 +417,44 @@ export const info = {
         },
         {
             "inputs": [],
+            "name": "basisPointsMint",
+            "outputs": [
+                {
+                    "internalType": "uint256",
+                    "name": "",
+                    "type": "uint256"
+                }
+            ],
+            "stateMutability": "view",
+            "type": "function"
+        },
+        {
+            "inputs": [],
             "name": "decimals",
             "outputs": [
                 {
                     "internalType": "uint8",
                     "name": "",
                     "type": "uint8"
+                }
+            ],
+            "stateMutability": "view",
+            "type": "function"
+        },
+        {
+            "inputs": [
+                {
+                    "internalType": "address",
+                    "name": "_address",
+                    "type": "address"
+                }
+            ],
+            "name": "isWhitelisted",
+            "outputs": [
+                {
+                    "internalType": "bool",
+                    "name": "",
+                    "type": "bool"
                 }
             ],
             "stateMutability": "view",
@@ -397,6 +501,19 @@ export const info = {
         },
         {
             "inputs": [],
+            "name": "supplyCap",
+            "outputs": [
+                {
+                    "internalType": "uint256",
+                    "name": "",
+                    "type": "uint256"
+                }
+            ],
+            "stateMutability": "view",
+            "type": "function"
+        },
+        {
+            "inputs": [],
             "name": "symbol",
             "outputs": [
                 {
@@ -429,6 +546,25 @@ export const info = {
                     "internalType": "address",
                     "name": "",
                     "type": "address"
+                }
+            ],
+            "stateMutability": "view",
+            "type": "function"
+        },
+        {
+            "inputs": [
+                {
+                    "internalType": "address",
+                    "name": "",
+                    "type": "address"
+                }
+            ],
+            "name": "whitelisted",
+            "outputs": [
+                {
+                    "internalType": "enum Whitelist.whitelistingStatus",
+                    "name": "",
+                    "type": "uint8"
                 }
             ],
             "stateMutability": "view",
