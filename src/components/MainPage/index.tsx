@@ -84,7 +84,7 @@ export const MainPage = () => {
       }
       else if (chainId === 1) {
         setMyTokenContract(new ethers.Contract(info.myTokenaddressMain, info.abi, library))
-        setUsdcContract(new ethers.Contract(info.myTokenaddressMain, info.abi, library))
+        setUsdcContract(new ethers.Contract(info.usdcContractAddressMain, info.abi, library))
       }
 
     }
@@ -292,7 +292,7 @@ export const MainPage = () => {
         try {
 
 
-          const getbalance = await usdcContract.balanceOf(info.myTokenaddressGoerli)
+          const getbalance = await usdcContract.balanceOf( chainId === 5 ? info.myTokenaddressGoerli : info.myTokenaddressMain)
 
           console.log('usdcbslance', (Number(getbalance.toString()) / 1000000).toFixed(6))
           // setContractUsdcBalance((Number(getbalance.toString()) / 1000000).toFixed(6))
@@ -325,7 +325,7 @@ export const MainPage = () => {
 
         try {
 
-          const allowance = await usdcContract.allowance(account, info.myTokenaddressGoerli)
+          const allowance = await usdcContract.allowance(account, chainId === 5 ? info.myTokenaddressGoerli : info.myTokenaddressMain)
 
           console.log('allowance', (Number(allowance.toString()) / 1000000).toFixed(6))
           // setContractUsdcBalance((Number(getbalance.toString())/1000000).toFixed(6))
@@ -373,7 +373,7 @@ export const MainPage = () => {
 
     if ((Number(tokenPrice) * Number(mintValue)) + Number(calculatedFee) > Number(allowance)) {
 
-      const output = await approve.send(info.myTokenaddressGoerli, Number(userUsdcbalance));
+      const output = await approve.send(chainId === 5 ? info.myTokenaddressGoerli : info.myTokenaddressMain, Number(userUsdcbalance));
 
       console.log('output', output)
       setRefetchAllowance(!refetchAllowance)
@@ -450,7 +450,7 @@ export const MainPage = () => {
 
             <VStack align={'start'} gap={5} bg={colorMode === 'light' ? 'gray.200' : 'gray.700'} rounded='lg' p={5}>
 
-              <HStack><Text >Token Contract: </Text> <Text fontWeight={'bold'}>{info.myTokenaddressGoerli}</Text></HStack>
+              <HStack><Text >Token Contract: </Text> <Text fontWeight={'bold'}>{chainId === 5 ? info.myTokenaddressGoerli : info.myTokenaddressMain}</Text></HStack>
 
               <HStack gap={8}>
                 <Stat>
