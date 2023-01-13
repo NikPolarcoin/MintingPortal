@@ -3,8 +3,8 @@ export const info = {
 
     usdcContractAddressGoerli: "0x07865c6E87B9F70255377e024ace6630C1Eaa37F",
     myTokenaddressGoerli: "0x93A301091793cAe8BC69c048c948650956A5e750",
-    usdcContractAddressMain: '0x07865c6E87B9F70255377e024ace6630C1Eaa37F',
-    myTokenaddressMain: '0xfe3BB51312761Dad5a3F7A0cfc7484817C1F4945',
+    usdcContractAddressMain: '0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48',
+    myTokenaddressMain: '0xbdd3dc331a8a382331dccb75a8392c24d7333a89',
     abi: [
         {
             "inputs": [],

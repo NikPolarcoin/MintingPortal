@@ -59,6 +59,10 @@ export const MainPage = () => {
   const [usdcContract, setUsdcContract] = useState<ethers.Contract>()
   const [whitelistStatus, setWhitelistStatus] = useState<number>()
 
+  const [feeBasis, setFeeBasis] = useState<string>()
+  const [calculatedFee, setCalculatedFee] = useState<string>()
+
+
   const [refetchWhitelistingStatus, setRefetchWhitelistingStatus] = useState(false)
 
 
@@ -132,7 +136,8 @@ export const MainPage = () => {
           const getbalance = await usdcContract.balanceOf(account)
 
           console.log('usdcbslance', (Number(getbalance.toString()) / 1000000).toFixed(6))
-          setUserUsdcBalance((Number(getbalance.toString()) / 1000000).toFixed(6))
+          // setUserUsdcBalance((Number(getbalance.toString()) / 1000000).toFixed(6))
+          setUserUsdcBalance(getbalance.toString())
         }
         catch (e) {
           console.log(e)
@@ -181,7 +186,9 @@ export const MainPage = () => {
           const getPrice = await myTokenContract.priceInUSDC()
 
           console.log('getPrice', (Number(getPrice.toString()) / 1000000).toFixed(6))
-          setTokenPrice((Number(getPrice.toString()) / 1000000).toFixed(6))
+          // setTokenPrice((Number(getPrice.toString()) / 1000000).toFixed(6))
+
+          setTokenPrice(getPrice.toString())
         }
         catch (e) {
           console.log(e)
@@ -196,6 +203,56 @@ export const MainPage = () => {
 
 
   }, [library, myTokenContract])
+
+
+
+
+
+  useEffect(() => {
+
+
+    if (library && myTokenContract) {
+
+      const getFeeBasisPoint = async () => {
+        try {
+
+          const getFeeBasis = await myTokenContract.basisPointsMint()
+
+          console.log('getFeeBasis', getFeeBasis.toString())
+          setFeeBasis(getFeeBasis.toString())
+        }
+        catch (e) {
+          console.log(e)
+        }
+
+      }
+
+
+      getFeeBasisPoint()
+    }
+
+
+
+  }, [library, myTokenContract])
+
+
+
+
+  useEffect(() => {
+
+    if (feeBasis && tokenPrice) {
+
+      const fee = Math.floor((Number(feeBasis) * (Number(mintValue) * Number(tokenPrice))) / 10000);
+      console.log("FEE", fee)
+      setCalculatedFee(String(fee))
+    }
+
+
+
+  }, [feeBasis, tokenPrice, mintValue])
+
+
+
 
 
   useEffect(() => {
@@ -238,7 +295,8 @@ export const MainPage = () => {
           const getbalance = await usdcContract.balanceOf(info.myTokenaddressGoerli)
 
           console.log('usdcbslance', (Number(getbalance.toString()) / 1000000).toFixed(6))
-          setContractUsdcBalance((Number(getbalance.toString()) / 1000000).toFixed(6))
+          // setContractUsdcBalance((Number(getbalance.toString()) / 1000000).toFixed(6))
+          setContractUsdcBalance(getbalance.toString())
         }
         catch (e) {
           console.log(e)
@@ -271,7 +329,8 @@ export const MainPage = () => {
 
           console.log('allowance', (Number(allowance.toString()) / 1000000).toFixed(6))
           // setContractUsdcBalance((Number(getbalance.toString())/1000000).toFixed(6))
-          setAllowance((Number(allowance.toString()) / 1000000).toFixed(6))
+          // setAllowance((Number(allowance.toString()) / 1000000).toFixed(6))
+          setAllowance(allowance.toString())
         }
         catch (e) {
           console.log(e)
@@ -312,9 +371,9 @@ export const MainPage = () => {
 
     setMintLoading(true)
 
-    if ((Number(tokenPrice) * Number(mintValue)) > Number(allowance)) {
+    if ((Number(tokenPrice) * Number(mintValue)) + Number(calculatedFee) > Number(allowance)) {
 
-      const output = await approve.send(info.myTokenaddressGoerli, Number(userUsdcbalance) * 1000000);
+      const output = await approve.send(info.myTokenaddressGoerli, Number(userUsdcbalance));
 
       console.log('output', output)
       setRefetchAllowance(!refetchAllowance)
@@ -363,7 +422,7 @@ export const MainPage = () => {
         {account && (chainId === 5 || chainId === 1) &&
           <VStack gap={5}>
 
-            <VStack  bg={colorMode === 'light' ? 'gray.200' : 'gray.700'} rounded='lg' p={5} align={'start'} gap={5}>
+            <VStack bg={colorMode === 'light' ? 'gray.200' : 'gray.700'} rounded='lg' p={5} align={'start'} gap={5}>
 
               <HStack><Text >Account Connected: </Text> <Text fontWeight={'bold'}> {account}</Text></HStack>
 
@@ -375,7 +434,7 @@ export const MainPage = () => {
 
                 <Stat>
                   <StatLabel>USDC</StatLabel>
-                  <StatNumber fontWeight={'bold'} fontSize={'sm'}>{userUsdcbalance && etherBalance ? userUsdcbalance : <Spinner />}</StatNumber>
+                  <StatNumber fontWeight={'bold'} fontSize={'sm'}>{userUsdcbalance && etherBalance ? (Number(userUsdcbalance.toString()) / 1000000).toFixed(6) : <Spinner />}</StatNumber>
                 </Stat>
 
                 <Stat>
@@ -396,12 +455,12 @@ export const MainPage = () => {
               <HStack gap={8}>
                 <Stat>
                   <StatLabel>Price</StatLabel>
-                  <StatNumber fontWeight={'bold'} fontSize={'sm'}>{tokenPrice ? tokenPrice : <Spinner />}</StatNumber>
+                  <StatNumber fontWeight={'bold'} fontSize={'sm'}>{tokenPrice ? (Number(tokenPrice.toString()) / 1000000).toFixed(6) : <Spinner />}</StatNumber>
                 </Stat>
 
                 <Stat>
                   <StatLabel>USDC</StatLabel>
-                  <StatNumber fontWeight={'bold'} fontSize={'sm'}>{contractUsdcbalance ? contractUsdcbalance : <Spinner />}</StatNumber>
+                  <StatNumber fontWeight={'bold'} fontSize={'sm'}>{contractUsdcbalance ? (Number(contractUsdcbalance.toString()) / 1000000).toFixed(6) : <Spinner />}</StatNumber>
                 </Stat>
 
                 <Stat>
@@ -416,20 +475,20 @@ export const MainPage = () => {
 
 
             {whitelistStatus === 0 &&
-              <Button disabled={applyWhitelistingLoading} onClick={()=>onApplyForWhitelistingHandler()}>  Apply for Whitelisting {applyWhitelistingLoading && <Spinner size={'sm'} ml={2} />} </Button>
+              <Button disabled={applyWhitelistingLoading} onClick={() => onApplyForWhitelistingHandler()}>  Apply for Whitelisting {applyWhitelistingLoading && <Spinner size={'sm'} ml={2} />} </Button>
             }
 
-            { whitelistStatus === 2 &&
+            {whitelistStatus === 2 &&
               <Text fontSize={'lg'}>You have already applied for whitelisting!</Text>
             }
 
-            {userUsdcbalance !== undefined && tokenPrice !== undefined && allowance !== undefined && userMyTokenbalance && whitelistStatus !== undefined && whitelistStatus === 1 &&
+            {userUsdcbalance !== undefined && tokenPrice !== undefined && allowance !== undefined && userMyTokenbalance && whitelistStatus !== undefined && whitelistStatus === 1 && calculatedFee !== undefined &&
 
               <VStack gap={5}>
                 <VStack>
                   <HStack>
                     <Box>
-                      <NumberInput onChange={(e: any) => setMintValue(e)} defaultValue={0} precision={0} min={0} max={(Number(userUsdcbalance) / Number(tokenPrice))}>
+                      <NumberInput onChange={(e: any) => setMintValue(e)} defaultValue={0} precision={0} min={0} >
                         <NumberInputField />
                         <NumberInputStepper>
                           <NumberIncrementStepper />
@@ -437,10 +496,25 @@ export const MainPage = () => {
                         </NumberInputStepper>
                       </NumberInput>
                     </Box>
-                    <Button onClick={() => onMintHandler()} isDisabled={!Number(mintValue) || mintLoading} >{(Number(tokenPrice) * Number(mintValue)) <= Number(allowance) ? 'Mint' : 'Approve USDC'}{mintLoading && <Spinner size={'sm'} ml={2} />}</Button>
+                    <Button onClick={() => onMintHandler()} isDisabled={!Number(mintValue) || mintLoading || (Number(tokenPrice) * Number(mintValue)) + Number(calculatedFee) > Number(userUsdcbalance)} >{(Number(tokenPrice) * Number(mintValue)) + Number(calculatedFee) <= Number(allowance) ? 'Mint' : 'Approve USDC'}{mintLoading && <Spinner size={'sm'} ml={2} />}</Button>
                   </HStack>
 
-                  <HStack fontSize={'sm'}><Text >Allowance:</Text> <Text fontWeight={'bold'}>{allowance} USDC</Text> </HStack>
+
+                  {(Number(tokenPrice) * Number(mintValue)) + Number(calculatedFee) > Number(userUsdcbalance) ? <Text fontSize={'xs'}  color='red' >You do not have sufficient USDC</Text> :
+
+                    <VStack fontSize={'xs'} align={'start'}>
+                    <HStack> 
+                      <HStack > <Text>Price: </Text> <Text fontWeight={'bold'}> ${((Number(tokenPrice) * Number(mintValue))/1000000).toFixed(6)}</Text></HStack>
+                      <Text>+</Text>
+                      <HStack> <Text>Fee: </Text> <Text fontWeight={'bold'}> ${((Number(calculatedFee))/1000000).toFixed(6)}</Text></HStack>
+                      <Text>=</Text>
+                      <HStack><Text fontWeight={'bold'}> ${(((Number(tokenPrice) * Number(mintValue))/1000000)+ ((Number(calculatedFee))/1000000)).toFixed(6)} </Text></HStack>
+
+                    </HStack>
+                    <HStack fontSize={'xs'}><Text >Allowance:</Text> <Text fontWeight={'bold'}>${(Number(allowance.toString()) / 1000000).toFixed(6)}</Text> </HStack>
+                    </VStack>
+
+                  }
 
                 </VStack>
 
@@ -457,7 +531,7 @@ export const MainPage = () => {
                     </Box>
                     <Button onClick={() => onBurnHandler()} isDisabled={!Number(burnValue) || BurnLoading} >Burn {BurnLoading && <Spinner size={'sm'} ml={2} />}</Button>
                   </HStack>
-                  {Number(contractUsdcbalance) < Number(burnValue) * Number(tokenPrice) && <Text color={'red'}>The contract does not have sufficient USDC</Text>}
+                  {Number(contractUsdcbalance) < Number(burnValue) * Number(tokenPrice) && <Text fontSize={'xs'}  color={'red'}>The contract does not have sufficient USDC</Text>}
 
                 </VStack>
 
