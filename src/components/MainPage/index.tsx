@@ -78,8 +78,8 @@ export const MainPage = () => {
     if (chainId) {
 
       if (chainId === 5) {
-        setMyTokenContract(new ethers.Contract(info.myTokenaddressMain, info.abi, library))
-        setUsdcContract(new ethers.Contract(info.usdcContractAddressMain, info.abi, library))
+        setMyTokenContract(new ethers.Contract(info.myTokenaddressGoerli, info.abi, library))
+        setUsdcContract(new ethers.Contract(info.myTokenaddressGoerli, info.abi, library))
 
       }
       else if (chainId === 1) {
