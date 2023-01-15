@@ -345,7 +345,7 @@ export const MainPage = () => {
 
 
 
-  }, [library, account, refetchAllowance, usdcContract])
+  }, [library, account, refetchAllowance, usdcContract, chainId])
 
 
 
