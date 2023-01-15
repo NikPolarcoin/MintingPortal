@@ -311,7 +311,7 @@ export const MainPage = () => {
 
 
 
-  }, [library, refetchContractData, usdcContract])
+  }, [library, refetchContractData, usdcContract, chainId])
 
 
 
